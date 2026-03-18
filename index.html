@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sea Potential × Ignore No More — Project Timeline</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;background:#fff;color:#1a1a1a;height:100vh;display:flex;flex-direction:column;overflow:hidden}
+
+/* Header */
+.header{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid #e5e5e5;flex-shrink:0;gap:12px;background:#fff;z-index:100}
+.header h1{font-size:15px;font-weight:600;color:#1a1a1a}
+.header-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.brand-label{font-size:11px;color:#888;font-weight:500}
+.btn{padding:5px 10px;border:1px solid #d1d1d1;border-radius:4px;background:#fff;cursor:pointer;font-size:12px;color:#444;white-space:nowrap}
+.btn:hover{background:#f5f5f5}
+.btn-primary{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.btn-primary:hover{background:#333}
+.btn-danger{background:#dc2626;color:#fff;border-color:#dc2626}
+.btn-sm{padding:3px 8px;font-size:11px}
+
+/* Filter tabs */
+.filter-bar{padding:8px 16px;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;gap:6px;flex-shrink:0;background:#fff}
+.filter-tab{padding:4px 12px;border-radius:20px;border:1px solid #e0e0e0;background:#fff;cursor:pointer;font-size:12px;color:#555}
+.filter-tab.active{background:#1a1a1a;color:#fff;border-color:#1a1a1a}
+.filter-tab:hover:not(.active){background:#f5f5f5}
+
+/* Main layout */
+.main{display:flex;flex:1;overflow:hidden;min-height:0}
+
+/* Gantt area */
+.gantt-container{flex:1;overflow:auto;min-width:0;display:flex;flex-direction:column}
+.gantt-header{display:flex;flex-shrink:0;border-bottom:2px solid #e5e5e5;background:#fafafa;position:sticky;top:0;z-index:50}
+.gantt-label-col{width:220px;flex-shrink:0;padding:6px 12px;font-weight:600;font-size:11px;color:#666;text-transform:uppercase;letter-spacing:.5px;border-right:1px solid #e5e5e5}
+.gantt-timeline-header{flex:1;overflow:hidden;position:relative;min-height:36px}
+.month-label{position:absolute;top:0;height:18px;border-right:1px solid #e5e5e5;padding:2px 6px;font-size:10px;font-weight:600;color:#666;text-transform:uppercase;white-space:nowrap;background:#fafafa}
+.week-label{position:absolute;top:18px;height:18px;border-right:1px solid #f0f0f0;padding:1px 3px;font-size:9px;color:#aaa;white-space:nowrap}
+
+/* Gantt body */
+.gantt-body{flex:1;overflow-y:auto;overflow-x:hidden}
+.gantt-row{display:flex;align-items:center;border-bottom:1px solid #f5f5f5;min-height:32px;position:relative}
+.gantt-row:hover{background:#fafafa}
+.gantt-row.selected{background:#f0f4ff}
+.gantt-label{width:220px;flex-shrink:0;padding:4px 12px;border-right:1px solid #e5e5e5;display:flex;align-items:center;gap:6px;cursor:pointer}
+.gantt-label .task-name{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
+.gantt-label .task-name.done{text-decoration:line-through;color:#aaa}
+.gantt-label .check-btn{width:14px;height:14px;border:1.5px solid #ccc;border-radius:2px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px}
+.gantt-label .check-btn.checked{background:#22c55e;border-color:#22c55e;color:#fff}
+.gantt-timeline{flex:1;position:relative;height:32px;overflow:hidden}
+
+/* Gantt bars */
+.gantt-bar{position:absolute;top:7px;height:18px;border-radius:3px;cursor:pointer;transition:opacity .15s;display:flex;align-items:center;overflow:hidden;min-width:6px}
+.gantt-bar:hover{opacity:.85}
+.gantt-bar.done{opacity:.5}
+.gantt-bar.done::after{content:'';position:absolute;left:0;right:0;top:50%;height:2px;background:rgba(0,0,0,.4)}
+.gantt-bar.blocked{border:2px dashed #dc2626 !important;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(220,38,38,.1) 4px,rgba(220,38,38,.1) 8px) !important}
+.bar-type-deliverable{background:#22c55e;border:2px solid #16a34a}
+.bar-type-client{background:#f59e0b;border:1px solid #d97706}
+.bar-type-agency{background:#86efac;border:1px solid #22c55e}
+.bar-type-build{background:#3b82f6;border:1px solid #2563eb}
+.bar-type-milestone{background:#a855f7;border:1px solid #9333ea}
+.bar-type-deadline{background:#ef4444;border:1px solid #dc2626}
+.bar-type-ooo{background:repeating-linear-gradient(45deg,#d1d5db,#d1d5db 4px,#e5e7eb 4px,#e5e7eb 8px);border:1px dashed #9ca3af}
+
+/* Diamond marker for single-day tasks */
+.gantt-diamond{position:absolute;top:50%;transform:translateY(-50%) rotate(45deg);width:14px;height:14px;cursor:pointer;transition:opacity .15s;margin-left:-7px}
+.gantt-diamond:hover{opacity:.85}
+.diamond-type-deliverable{background:#22c55e;border:2px solid #16a34a}
+.diamond-type-client{background:#f59e0b;border:1px solid #d97706}
+.diamond-type-agency{background:#86efac;border:1px solid #22c55e}
+.diamond-type-build{background:#3b82f6;border:1px solid #2563eb}
+.diamond-type-milestone{background:#a855f7;border:2px solid #9333ea}
+.diamond-type-deadline{background:#ef4444;border:2px solid #dc2626}
+.diamond-type-ooo{background:#d1d5db;border:1px dashed #9ca3af}
+
+.done-tag{position:absolute;bottom:-1px;font-size:9px;color:#22c55e;white-space:nowrap;left:0;pointer-events:none}
+.blocked-badge{position:absolute;top:2px;right:2px;background:#dc2626;color:#fff;font-size:8px;padding:1px 3px;border-radius:2px;pointer-events:none}
+
+/* Today line */
+.today-line{position:absolute;top:0;bottom:0;width:2px;background:#ef4444;z-index:40;pointer-events:none}
+.today-line::after{content:'TODAY';position:absolute;top:0;left:3px;font-size:8px;color:#ef4444;font-weight:700;white-space:nowrap}
+
+/* OOO band */
+.ooo-band{position:absolute;top:0;bottom:0;background:rgba(156,163,175,.12);border-left:1px dashed #9ca3af;border-right:1px dashed #9ca3af;pointer-events:none;z-index:1}
+
+/* Phase headers */
+.phase-header{display:flex;align-items:center;background:#f8f8f8;border-bottom:1px solid #e5e5e5;cursor:pointer;min-height:30px}
+.phase-header:hover{background:#f0f0f0}
+.phase-label-cell{width:220px;flex-shrink:0;padding:4px 12px;border-right:1px solid #e5e5e5;display:flex;align-items:center;gap:6px}
+.phase-toggle{font-size:10px;color:#888;transition:transform .15s}
+.phase-toggle.collapsed{transform:rotate(-90deg)}
+.phase-name{font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#555}
+.phase-timeline-area{flex:1;position:relative;height:30px}
+
+/* Detail panel */
+.detail-panel{width:320px;flex-shrink:0;border-left:1px solid #e5e5e5;display:flex;flex-direction:column;overflow:hidden;background:#fff;transition:width .2s}
+.detail-panel.hidden{width:0;border-left:none;overflow:hidden}
+.detail-header{padding:12px 16px;border-bottom:1px solid #e5e5e5;display:flex;align-items:flex-start;gap:8px}
+.detail-title{font-weight:600;font-size:14px;flex:1;line-height:1.3}
+.detail-close{cursor:pointer;color:#aaa;font-size:18px;line-height:1;flex-shrink:0}
+.detail-close:hover{color:#1a1a1a}
+.detail-body{padding:12px 16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.detail-row{display:flex;flex-direction:column;gap:3px}
+.detail-label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#999;font-weight:600}
+.detail-value{font-size:13px;color:#1a1a1a;line-height:1.4}
+.type-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:11px;font-weight:600;text-transform:capitalize}
+.badge-deliverable{background:#dcfce7;color:#166534}
+.badge-client{background:#fef3c7;color:#92400e}
+.badge-agency{background:#d1fae5;color:#065f46}
+.badge-build{background:#dbeafe;color:#1e3a5f}
+.badge-milestone{background:#f3e8ff;color:#6b21a8}
+.badge-deadline{background:#fee2e2;color:#991b1b}
+.badge-ooo{background:#f3f4f6;color:#374151}
+.detail-notes{font-size:12px;color:#444;line-height:1.5;background:#f9f9f9;padding:8px;border-radius:4px;white-space:pre-wrap}
+.blocked-item{display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;cursor:pointer}
+.blocked-item:hover{text-decoration:underline}
+.blocked-status{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.status-done{background:#22c55e}
+.status-pending{background:#f59e0b}
+.checkoff-section{border-top:1px solid #e5e5e5;padding-top:12px}
+.completion-log{font-size:11px;color:#666;line-height:1.6}
+.log-entry{padding:2px 0;border-bottom:1px solid #f0f0f0}
+.log-entry:last-child{border-bottom:none}
+.edit-field{width:100%;border:1px solid #d1d1d1;border-radius:4px;padding:4px 8px;font-size:13px;font-family:inherit}
+.edit-field:focus{outline:none;border-color:#3b82f6}
+textarea.edit-field{resize:vertical;min-height:60px}
+.detail-actions{display:flex;gap:6px;flex-wrap:wrap}
+
+/* Add task modal */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center}
+.modal-overlay.hidden{display:none}
+.modal{background:#fff;border-radius:8px;padding:20px;width:480px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal h2{font-size:15px;font-weight:600;margin-bottom:16px}
+.form-row{display:flex;flex-direction:column;gap:4px;margin-bottom:12px}
+.form-row label{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.form-row input,.form-row select,.form-row textarea{border:1px solid #d1d1d1;border-radius:4px;padding:6px 10px;font-size:13px;font-family:inherit;width:100%}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{outline:none;border-color:#3b82f6}
+.form-row textarea{resize:vertical;min-height:60px}
+.form-row select[multiple]{min-height:80px}
+.form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+/* Settings panel */
+.settings-panel{position:fixed;right:0;top:0;bottom:0;width:320px;background:#fff;border-left:1px solid #e5e5e5;z-index:150;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .2s;box-shadow:-4px 0 20px rgba(0,0,0,.1)}
+.settings-panel.open{transform:translateX(0)}
+.settings-header{padding:12px 16px;border-bottom:1px solid #e5e5e5;display:flex;align-items:center;justify-content:space-between}
+.settings-header h2{font-size:14px;font-weight:600}
+.settings-body{padding:16px;flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.settings-section{display:flex;flex-direction:column;gap:8px}
+.settings-section h3{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#888}
+.settings-row{display:flex;flex-direction:column;gap:3px}
+.settings-row label{font-size:12px;color:#555}
+.settings-row input{border:1px solid #d1d1d1;border-radius:4px;padding:5px 8px;font-size:12px;font-family:inherit}
+
+/* Legend */
+.legend{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:4px 16px;border-bottom:1px solid #e5e5e5;flex-shrink:0;background:#fafafa}
+.legend-item{display:flex;align-items:center;gap:4px;font-size:10px;color:#666}
+.legend-swatch{width:12px;height:12px;border-radius:2px}
+
+/* Name prompt overlay */
+.name-prompt{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:250;display:flex;align-items:center;justify-content:center}
+.name-prompt.hidden{display:none}
+.name-prompt-box{background:#fff;border-radius:8px;padding:20px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.name-prompt-box h3{font-size:14px;font-weight:600;margin-bottom:12px}
+.name-prompt-box input{border:1px solid #d1d1d1;border-radius:4px;padding:7px 10px;font-size:13px;width:100%;margin-bottom:12px}
+.name-prompt-box input:focus{outline:none;border-color:#3b82f6}
+.name-prompt-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#f5f5f5}
+::-webkit-scrollbar-thumb{background:#ccc;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#aaa}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div>
+    <h1>Sea Potential — Project Timeline</h1>
+  </div>
+  <div class="header-right">
+    <button class="btn btn-primary" onclick="openAddTask()">+ Add Task</button>
+    <button class="btn" onclick="exportData()">Export JSON</button>
+    <label class="btn" style="cursor:pointer">Import JSON<input type="file" accept=".json" style="display:none" onchange="importData(event)"></label>
+    <button class="btn" onclick="toggleSettings()">⚙ Settings</button>
+    <span class="brand-label">Ignore No More × Sea Potential</span>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <span style="font-size:10px;font-weight:600;color:#888;margin-right:4px">TYPE:</span>
+  <div class="legend-item"><div class="legend-swatch bar-type-deliverable"></div>Deliverable</div>
+  <div class="legend-item"><div class="legend-swatch bar-type-client"></div>Client</div>
+  <div class="legend-item"><div class="legend-swatch bar-type-agency"></div>Agency</div>
+  <div class="legend-item"><div class="legend-swatch bar-type-build"></div>Build</div>
+  <div class="legend-item"><div class="legend-swatch bar-type-milestone"></div>Milestone</div>
+  <div class="legend-item"><div class="legend-swatch bar-type-deadline"></div>Deadline</div>
+  <div class="legend-item"><div class="legend-swatch bar-type-ooo" style="width:16px"></div>OOO</div>
+  <span style="margin-left:8px;color:#dc2626;font-size:10px;font-weight:600">⚠ red dash = blocked</span>
+</div>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+  <span style="font-size:11px;color:#888;margin-right:4px">View:</span>
+  <div id="filter-tabs"></div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <div class="gantt-container" id="gantt-container">
+    <div class="gantt-header" id="gantt-header">
+      <div class="gantt-label-col">Task</div>
+      <div class="gantt-timeline-header" id="timeline-header"></div>
+    </div>
+    <div class="gantt-body" id="gantt-body"></div>
+  </div>
+  <div class="detail-panel hidden" id="detail-panel">
+    <div class="detail-header">
+      <div class="detail-title" id="detail-title">—</div>
+      <div class="detail-close" onclick="closeDetail()">×</div>
+    </div>
+    <div class="detail-body" id="detail-body"></div>
+  </div>
+</div>
+
+<!-- Add Task Modal -->
+<div class="modal-overlay hidden" id="add-task-modal">
+  <div class="modal">
+    <h2>Add New Task</h2>
+    <div class="form-row">
+      <label>Task Name *</label>
+      <input type="text" id="new-name" placeholder="Task name">
+    </div>
+    <div style="display:flex;gap:12px">
+      <div class="form-row" style="flex:1">
+        <label>Start Date *</label>
+        <input type="date" id="new-start">
+      </div>
+      <div class="form-row" style="flex:1">
+        <label>End Date *</label>
+        <input type="date" id="new-end">
+      </div>
+    </div>
+    <div style="display:flex;gap:12px">
+      <div class="form-row" style="flex:1">
+        <label>Owner</label>
+        <input type="text" id="new-owner" placeholder="e.g. Sophia">
+      </div>
+      <div class="form-row" style="flex:1">
+        <label>Type</label>
+        <select id="new-type">
+          <option value="deliverable">Deliverable</option>
+          <option value="client">Client</option>
+          <option value="agency">Agency</option>
+          <option value="build">Build</option>
+          <option value="milestone">Milestone</option>
+          <option value="deadline">Deadline</option>
+          <option value="ooo">OOO</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Phase</label>
+      <select id="new-phase">
+        <option value="PRE-OOO">PRE-OOO</option>
+        <option value="FULL TEAM OOO">FULL TEAM OOO</option>
+        <option value="PHASE 1 BRANDING">PHASE 1 BRANDING</option>
+        <option value="PHASE 2 JOB BOARD">PHASE 2 JOB BOARD</option>
+        <option value="PHASE 3 WEBSITE">PHASE 3 WEBSITE</option>
+        <option value="PHASE 4 CERTIFICATION">PHASE 4 CERTIFICATION</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Notes</label>
+      <textarea id="new-notes" placeholder="Optional notes..."></textarea>
+    </div>
+    <div class="form-row">
+      <label>Blocked By (hold Ctrl/Cmd to select multiple)</label>
+      <select id="new-blocked-by" multiple></select>
+    </div>
+    <div class="form-actions">
+      <button class="btn" onclick="closeAddTask()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveNewTask()">Save Task</button>
+    </div>
+  </div>
+</div>
+
+<!-- Name Prompt -->
+<div class="name-prompt hidden" id="name-prompt">
+  <div class="name-prompt-box">
+    <h3 id="name-prompt-title">Who is marking this done?</h3>
+    <input type="text" id="name-prompt-input" placeholder="Your name" onkeydown="if(event.key==='Enter')confirmNamePrompt()">
+    <div class="name-prompt-actions">
+      <button class="btn" onclick="cancelNamePrompt()">Cancel</button>
+      <button class="btn btn-primary" onclick="confirmNamePrompt()">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div class="settings-panel" id="settings-panel">
+  <div class="settings-header">
+    <h2>Settings</h2>
+    <div class="detail-close" onclick="toggleSettings()">×</div>
+  </div>
+  <div class="settings-body">
+    <div class="settings-section">
+      <h3>Today Override</h3>
+      <div class="settings-row">
+        <label>Today's date (for presenting)</label>
+        <input type="date" id="setting-today" onchange="applySettings()">
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>OOO Band</h3>
+      <div class="settings-row">
+        <label>OOO Start</label>
+        <input type="date" id="setting-ooo-start" onchange="applySettings()">
+      </div>
+      <div class="settings-row">
+        <label>OOO End</label>
+        <input type="date" id="setting-ooo-end" onchange="applySettings()">
+      </div>
+    </div>
+    <div class="settings-section">
+      <h3>Filter Tabs</h3>
+      <div id="settings-tabs-config"></div>
+    </div>
+    <button class="btn btn-danger btn-sm" onclick="if(confirm('Reset ALL data to defaults?')){resetData()}">Reset All Data</button>
+  </div>
+</div>
+
+<script>
+// ─── DATA ────────────────────────────────────────────────────────────────────
+const PHASES = ['PRE-OOO','FULL TEAM OOO','PHASE 1 BRANDING','PHASE 2 JOB BOARD','PHASE 3 WEBSITE','PHASE 4 CERTIFICATION'];
+
+const DEFAULT_TASKS = [
+  {id:'t1',name:'Cert framework Notion doc → SP',start:'2026-03-18',end:'2026-03-18',owner:'Sophia',type:'deliverable',phase:'PRE-OOO',notes:'Already built — send today EOD. This is the fill-in doc for Angela\'s cert + consulting flow.'},
+  {id:'t2',name:'Preliminary branding → SP',start:'2026-03-19',end:'2026-03-19',owner:'INM design',type:'deliverable',phase:'PRE-OOO',notes:'First pass logo, colors, type. For review only — not final.'},
+  {id:'t3',name:'Job board setup outline → Angela',start:'2026-03-20',end:'2026-03-20',owner:'Sophia',type:'deliverable',phase:'PRE-OOO',notes:'Step-by-step of what to fill into Niceboard so Angela can build a sample employer profile + get screenshots for the funder deck.'},
+  {id:'t4',name:'Cert framework back from SP',start:'2026-03-20',end:'2026-03-20',owner:'Sea Potential',type:'client',phase:'PRE-OOO',notes:'SP fills in categories, tiers, pricing, rating scale. Due noon Fri Mar 20 EST. Hard deadline — Sophia leaves for OOO after this.'},
+  {id:'t5',name:'INM full team OOO',start:'2026-03-20',end:'2026-04-01',owner:'INM',type:'ooo',phase:'FULL TEAM OOO',notes:'No INM deliverables. Angela is running beta partner meetings and funder prep.'},
+  {id:'t6',name:'Penny: sales sessions w/ beta testers',start:'2026-03-19',end:'2026-04-15',owner:'Penny + SP',type:'client',phase:'FULL TEAM OOO',notes:'Repeatable sales process focus — NOT tied to cert timeline. Output: buyer personas, sales journey map.'},
+  {id:'t7',name:'SP: gather beta employer list',start:'2026-03-20',end:'2026-04-01',owner:'Ebony',type:'client',phase:'FULL TEAM OOO',notes:'3-5 employers confirmed for job board seed launch. Name, email, company, job types needed by Apr 1.'},
+  {id:'t8',name:'SP: draft readiness quiz questions',start:'2026-03-20',end:'2026-04-01',owner:'Savannah',type:'client',phase:'FULL TEAM OOO',notes:'8-12 questions, 3 outcome buckets: Ready to apply / Almost ready / Explore first. Use Ann Avary\'s self-assessment as starting point.'},
+  {id:'t9',name:'Angela: build sample Niceboard employer profile',start:'2026-03-20',end:'2026-04-05',owner:'Angela',type:'client',phase:'FULL TEAM OOO',notes:'Using Sophia\'s job board outline, build a sample employer account in Niceboard. Screenshot it for the funder deck. Message Sophia if anything needs doctoring.'},
+  {id:'t10',name:'Angela: beta partner meetings + funder prep',start:'2026-03-20',end:'2026-04-05',owner:'Angela',type:'client',phase:'FULL TEAM OOO',notes:'Breakfast lunch dinners happy hours — inside the belly of the beast. CEOs being met next week. Uses brand direction + ecosystem visual.'},
+  {id:'t11',name:'Brand identity build',start:'2026-04-01',end:'2026-04-15',owner:'INM design',type:'agency',phase:'PHASE 1 BRANDING',notes:'Full system: logo variants, color palette, typography. Hard gate before any visual platform config. NOTE: Savannah in Italy Apr 19–29 — approval must happen before she leaves.'},
+  {id:'t12',name:'Brand approval — HARD GATE',start:'2026-04-15',end:'2026-04-18',owner:'Ebony + Savannah',type:'milestone',phase:'PHASE 1 BRANDING',notes:'Nothing gets visually configured until approved. 48hr review window. Savannah leaves Apr 19 so this cannot slip.'},
+  {id:'t13',name:'MVP consulting program setup',start:'2026-04-01',end:'2026-04-01',owner:'INM build',type:'deliverable',phase:'PHASE 2 JOB BOARD',notes:'Podia containers built, flow configured. Structure only — content goes in later. Ebony can screenshot for proposal. Due EOD Apr 1.',blockedBy:['t4']},
+  {id:'t14',name:'MVP job board setup',start:'2026-04-01',end:'2026-04-01',owner:'INM build',type:'deliverable',phase:'PHASE 2 JOB BOARD',notes:'Niceboard: account, domain, brand config, employer + job seeker account types, maritime fields. Due EOD Apr 1.'},
+  {id:'t15',name:'Preliminary funder deck → Angela',start:'2026-04-01',end:'2026-04-01',owner:'Sophia',type:'deliverable',phase:'PHASE 2 JOB BOARD',notes:'Slide deck: what makes the job board different, job board mockup screenshots, cert process visual. Exported to Canva so Angela can edit. Due EOD Apr 1.',blockedBy:['t14','t13']},
+  {id:'t16',name:'Full systems + info flow doc',start:'2026-04-02',end:'2026-04-02',owner:'Sophia',type:'deliverable',phase:'PHASE 2 JOB BOARD',notes:'How all platforms connect, info flows, MVP checklist per platform, email plan, API decision. Due EOD Apr 2 (Thu).'},
+  {id:'t17',name:'FUNDER INTERVIEW ~$700K',start:'2026-04-06',end:'2026-04-07',owner:'Angela + Ebony',type:'deadline',phase:'PHASE 2 JOB BOARD',notes:'In-person interview. Angela needs deck with job board screenshots + cert process visual. Ebony speaks to prior work. Date TBC between Apr 6–7.'},
+  {id:'t18',name:'Tally: readiness quiz build',start:'2026-04-01',end:'2026-04-08',owner:'INM build',type:'build',phase:'PHASE 2 JOB BOARD',notes:'Build in Tally (not Typeform — free plan, more custom-branded). Requires SP quiz questions by Apr 1.',blockedBy:['t8']},
+  {id:'t19',name:'Email system setup',start:'2026-04-01',end:'2026-04-08',owner:'INM build',type:'build',phase:'PHASE 2 JOB BOARD',notes:'Audience segments + welcome sequences for employers and all 3 job seeker buckets. Must exist before automations can route anyone.'},
+  {id:'t20',name:'API connections: Niceboard → email → Tally → Podia',start:'2026-04-08',end:'2026-04-12',owner:'INM build + dev',type:'build',phase:'PHASE 2 JOB BOARD',notes:'Use API not Zapier where possible. Developer friend called in for 2hrs. Test all flows with dummy accounts.'},
+  {id:'t21',name:'Podia: community plans setup',start:'2026-04-08',end:'2026-04-15',owner:'INM build',type:'build',phase:'PHASE 2 JOB BOARD',notes:'3 Plans: Employer, Job Seeker, future Mentor. Hidden topics per plan.'},
+  {id:'t22',name:'Niceboard: visual brand config',start:'2026-04-18',end:'2026-04-22',owner:'INM build',type:'build',phase:'PHASE 2 JOB BOARD',notes:'Apply brand after approval. Job posting template. Certified Employer tag field.',blockedBy:['t12']},
+  {id:'t23',name:'SP: seed beta employer accounts',start:'2026-04-18',end:'2026-04-22',owner:'Ebony/Angela',type:'client',phase:'PHASE 2 JOB BOARD',notes:'Personal onboarding of 3-5 employers. 30-min call or Loom walkthrough. At least 1 live job posting each.'},
+  {id:'t24',name:'QA: full user flow test',start:'2026-04-22',end:'2026-04-25',owner:'INM',type:'agency',phase:'PHASE 2 JOB BOARD',notes:'Test job seeker + employer journeys end to end. Fix broken automations, email formatting, mobile display.'},
+  {id:'t25',name:'Job board soft launch',start:'2026-04-28',end:'2026-04-30',owner:'SP + INM',type:'milestone',phase:'PHASE 2 JOB BOARD',notes:'Live with beta employers seeded. Announce to SP network. Monitor API/automation logs weekly.'},
+  {id:'t26',name:'Website copy — all pages',start:'2026-04-15',end:'2026-05-09',owner:'INM copy',type:'agency',phase:'PHASE 3 WEBSITE',notes:'All pages using new brand voice. Cert page is placeholder/waitlist. Requires brand approval first.'},
+  {id:'t27',name:'Website dev + design (Framer)',start:'2026-05-01',end:'2026-05-22',owner:'Kate Dole + INM',type:'build',phase:'PHASE 3 WEBSITE',notes:'4-week build in Framer. $7,500 separate fee. Job board linked prominently. Cert page is placeholder.',blockedBy:['t12','t26']},
+  {id:'t28',name:'Website launch',start:'2026-05-22',end:'2026-05-25',owner:'SP + INM',type:'milestone',phase:'PHASE 3 WEBSITE',notes:'Site live. Analytics configured. Cert page is email capture waitlist until Phase 4.'},
+  {id:'t29',name:'Cert content outline from consulting',start:'2026-04-15',end:'2026-06-01',owner:'Penny + Savannah',type:'client',phase:'PHASE 4 CERTIFICATION',notes:'HARD DEPENDENCY — cert cannot be built without this. Penny\'s sessions produce module throughlines from beta employers.'},
+  {id:'t30',name:'Podia: course architecture + modules',start:'2026-06-01',end:'2026-06-14',owner:'INM build',type:'build',phase:'PHASE 4 CERTIFICATION',notes:'4-module course, content upload, assessments configured, cohort enrollment.',blockedBy:['t29']},
+  {id:'t31',name:'Accredible: badge design + setup',start:'2026-06-08',end:'2026-06-14',owner:'INM build',type:'build',phase:'PHASE 4 CERTIFICATION',notes:'Design badge, connect to Podia completion trigger, test issuance end-to-end.'},
+  {id:'t32',name:'Manual badge → Niceboard SOP',start:'2026-06-14',end:'2026-06-18',owner:'INM + SP ops',type:'agency',phase:'PHASE 4 CERTIFICATION',notes:'Document + train: employer completes cert → admin manually updates Niceboard certified tag. Write checklist. Train Ebony + Angela.'},
+  {id:'t33',name:'Cert email sequence',start:'2026-06-14',end:'2026-06-21',owner:'INM build',type:'build',phase:'PHASE 4 CERTIFICATION',notes:'Enrollment confirm, module reminders, completion + badge notification, renewal reminder at 11 months.'},
+  {id:'t34',name:'Beta employer certification cohort',start:'2026-06-21',end:'2026-07-15',owner:'Sea Potential',type:'client',phase:'PHASE 4 CERTIFICATION',notes:'First 3-5 employers through full cert. SP facilitates. INM monitors for tech issues. Gather testimonials.'},
+  {id:'t35',name:'Certification officially live',start:'2026-07-15',end:'2026-07-18',owner:'SP + INM',type:'milestone',phase:'PHASE 4 CERTIFICATION',notes:'Open for enrollment. Badge live on job board. Website cert page updated to full sales page.',blockedBy:['t34']}
+];
+
+const DEFAULT_SETTINGS = {
+  today: '2026-03-18',
+  oooStart: '2026-03-20',
+  oooEnd: '2026-04-01',
+  filters: [
+    {label:'Now → Apr 7',start:'2026-03-15',end:'2026-04-08'},
+    {label:'Mar–May',start:'2026-03-01',end:'2026-05-31'},
+    {label:'Full Timeline',start:'2026-03-15',end:'2026-07-25'},
+    {label:'Cert Sprint',start:'2026-06-01',end:'2026-07-25'}
+  ]
+};
+
+// ─── STATE ───────────────────────────────────────────────────────────────────
+let tasks = [];
+let settings = {};
+let completions = {}; // taskId -> [{name,ts,action}]
+let collapsedPhases = {};
+let activeFilter = 0;
+let selectedTaskId = null;
+let namePromptCallback = null;
+let isEditing = false;
+
+function loadState() {
+  try {
+    const savedTasks = localStorage.getItem('sp_tasks');
+    tasks = savedTasks ? JSON.parse(savedTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS));
+    const savedSettings = localStorage.getItem('sp_settings');
+    settings = savedSettings ? JSON.parse(savedSettings) : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    const savedCompletions = localStorage.getItem('sp_completions');
+    completions = savedCompletions ? JSON.parse(savedCompletions) : {};
+    const savedCollapsed = localStorage.getItem('sp_collapsed');
+    collapsedPhases = savedCollapsed ? JSON.parse(savedCollapsed) : {};
+  } catch(e) {
+    tasks = JSON.parse(JSON.stringify(DEFAULT_TASKS));
+    settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    completions = {};
+    collapsedPhases = {};
+  }
+}
+
+function saveState() {
+  localStorage.setItem('sp_tasks', JSON.stringify(tasks));
+  localStorage.setItem('sp_settings', JSON.stringify(settings));
+  localStorage.setItem('sp_completions', JSON.stringify(completions));
+  localStorage.setItem('sp_collapsed', JSON.stringify(collapsedPhases));
+}
+
+function resetData() {
+  localStorage.clear();
+  loadState();
+  render();
+}
+
+// ─── DATE UTILS ──────────────────────────────────────────────────────────────
+function parseDate(s) {
+  const [y,m,d] = s.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+function dateToStr(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function daysBetween(a,b) {
+  return (parseDate(b)-parseDate(a))/(86400000);
+}
+function addDays(s,n) {
+  const d = parseDate(s);
+  d.setDate(d.getDate()+n);
+  return dateToStr(d);
+}
+function fmtDate(s) {
+  const d = parseDate(s);
+  return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+}
+
+// ─── TASK UTILS ──────────────────────────────────────────────────────────────
+function isTaskDone(id) {
+  const log = completions[id]||[];
+  if (!log.length) return false;
+  return log[log.length-1].action === 'check';
+}
+
+function isBlocked(task) {
+  if (!task.blockedBy || !task.blockedBy.length) return false;
+  return task.blockedBy.some(bid => !isTaskDone(bid));
+}
+
+function getBlockerDetails(task) {
+  if (!task.blockedBy) return [];
+  return task.blockedBy.map(bid => {
+    const bt = tasks.find(t=>t.id===bid);
+    return {id:bid, name:bt?bt.name:'(unknown)', done:isTaskDone(bid)};
+  });
+}
+
+// ─── FILTER ──────────────────────────────────────────────────────────────────
+function getFilterRange() {
+  return settings.filters[activeFilter] || settings.filters[0];
+}
+
+function taskInRange(task, range) {
+  const ts = parseDate(task.start), te = parseDate(task.end);
+  const rs = parseDate(range.start), re = parseDate(range.end);
+  return te >= rs && ts <= re;
+}
+
+// ─── GANTT GEOMETRY ──────────────────────────────────────────────────────────
+let ganttStartDate = '2026-03-15';
+let ganttEndDate = '2026-07-25';
+let ganttDayWidth = 16; // px per day
+
+function setGanttRange(start, end) {
+  ganttStartDate = start;
+  ganttEndDate = end;
+}
+
+function dateToX(s) {
+  return daysBetween(ganttStartDate, s) * ganttDayWidth;
+}
+
+function totalWidth() {
+  return Math.max(daysBetween(ganttStartDate, ganttEndDate) * ganttDayWidth, 600);
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────────────────
+function render() {
+  renderFilterTabs();
+  renderSettingsUI();
+
+  const range = getFilterRange();
+  setGanttRange(range.start, range.end);
+
+  renderTimelineHeader();
+  renderGanttBody();
+
+  if (selectedTaskId) {
+    const t = tasks.find(t=>t.id===selectedTaskId);
+    if (t) renderDetailPanel(t);
+  }
+}
+
+function renderFilterTabs() {
+  const el = document.getElementById('filter-tabs');
+  el.innerHTML = '';
+  settings.filters.forEach((f,i) => {
+    const tab = document.createElement('button');
+    tab.className = 'filter-tab' + (i===activeFilter?' active':'');
+    tab.textContent = f.label;
+    tab.onclick = () => { activeFilter = i; render(); };
+    el.appendChild(tab);
+  });
+}
+
+function renderTimelineHeader() {
+  const container = document.getElementById('timeline-header');
+  const w = totalWidth();
+  container.style.width = w+'px';
+  container.innerHTML = '';
+
+  // Month labels
+  let cur = parseDate(ganttStartDate);
+  const end = parseDate(ganttEndDate);
+  while(cur <= end) {
+    const x = dateToX(dateToStr(cur));
+    const monthEl = document.createElement('div');
+    monthEl.className = 'month-label';
+    monthEl.style.left = x+'px';
+    const mn = cur.toLocaleDateString('en-US',{month:'short',year:'2-digit'});
+    // Find end of month
+    const nxt = new Date(cur.getFullYear(), cur.getMonth()+1, 1);
+    const endX = Math.min(dateToX(dateToStr(nxt)), w);
+    monthEl.style.width = (endX-x)+'px';
+    monthEl.textContent = mn;
+    container.appendChild(monthEl);
+    cur = nxt;
+  }
+
+  // Week labels
+  cur = parseDate(ganttStartDate);
+  // Advance to nearest Monday
+  while(cur.getDay() !== 1) cur.setDate(cur.getDate()+1);
+  while(cur <= end) {
+    const x = dateToX(dateToStr(cur));
+    const wl = document.createElement('div');
+    wl.className = 'week-label';
+    wl.style.left = x+'px';
+    wl.textContent = (cur.getMonth()+1)+'/'+cur.getDate();
+    container.appendChild(wl);
+    cur.setDate(cur.getDate()+7);
+  }
+}
+
+function renderGanttBody() {
+  const body = document.getElementById('gantt-body');
+  body.innerHTML = '';
+
+  const range = getFilterRange();
+  const w = totalWidth();
+
+  PHASES.forEach(phase => {
+    const phaseTasks = tasks.filter(t => t.phase === phase);
+    if (!phaseTasks.length) return;
+
+    // Phase header
+    const phRow = document.createElement('div');
+    phRow.className = 'phase-header';
+    phRow.onclick = () => {
+      collapsedPhases[phase] = !collapsedPhases[phase];
+      saveState();
+      renderGanttBody();
+    };
+    const collapsed = !!collapsedPhases[phase];
+
+    phRow.innerHTML = `
+      <div class="phase-label-cell">
+        <span class="phase-toggle${collapsed?' collapsed':''}">▼</span>
+        <span class="phase-name">${phase}</span>
+      </div>
+      <div class="phase-timeline-area" style="width:${w}px;position:relative">
+        ${renderOOOBand(w)}
+        ${renderTodayLine(w)}
+      </div>
+    `;
+    body.appendChild(phRow);
+
+    if (collapsed) return;
+
+    phaseTasks.forEach(task => {
+      if (!taskInRange(task, range)) return;
+      const row = renderTaskRow(task, w, range);
+      body.appendChild(row);
+    });
+  });
+
+  // Completed tasks section (collapsed by default)
+  const doneTasks = tasks.filter(t => isTaskDone(t.id) && taskInRange(t, range));
+  // They're already rendered inline with strikethrough; skip separate section
+}
+
+function renderOOOBand(w) {
+  const oooS = dateToX(settings.oooStart);
+  const oooE = dateToX(addDays(settings.oooEnd,1));
+  if (oooE <= 0 || oooS >= w) return '';
+  const left = Math.max(0,oooS);
+  const width = Math.min(oooE, w) - left;
+  if (width <= 0) return '';
+  return `<div class="ooo-band" style="left:${left}px;width:${width}px"></div>`;
+}
+
+function renderTodayLine(w) {
+  const tx = dateToX(settings.today);
+  if (tx < 0 || tx > w) return '';
+  return `<div class="today-line" style="left:${tx}px"></div>`;
+}
+
+function renderTaskRow(task, w, range) {
+  const row = document.createElement('div');
+  row.className = 'gantt-row' + (selectedTaskId===task.id?' selected':'');
+  row.dataset.taskId = task.id;
+
+  const done = isTaskDone(task.id);
+  const blocked = isBlocked(task) && !done;
+  const log = completions[task.id]||[];
+  const lastCheck = done ? log[log.length-1] : null;
+
+  const taskLabel = document.createElement('div');
+  taskLabel.className = 'gantt-label';
+  taskLabel.innerHTML = `
+    <div class="check-btn${done?' checked':''}" data-id="${task.id}" title="${done?'Uncheck':'Check off'}">
+      ${done?'✓':''}
+    </div>
+    <div class="task-name${done?' done':''}" title="${task.name}">${task.name}</div>
+  `;
+  taskLabel.querySelector('.check-btn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    handleCheckToggle(task.id);
+  });
+  taskLabel.addEventListener('click', () => openDetail(task.id));
+  row.appendChild(taskLabel);
+
+  const timeline = document.createElement('div');
+  timeline.className = 'gantt-timeline';
+  timeline.style.width = w+'px';
+  timeline.innerHTML = renderOOOBand(w) + renderTodayLine(w);
+
+  // Render bar or diamond
+  const singleDay = task.start === task.end;
+  if (singleDay) {
+    const x = dateToX(task.start) + ganttDayWidth/2;
+    const diamond = document.createElement('div');
+    diamond.className = `gantt-diamond diamond-type-${task.type}${done?' done':''}${blocked?' blocked':''}`;
+    diamond.style.left = x+'px';
+    diamond.style.top = '50%';
+    if (blocked) {
+      diamond.style.border = '2px dashed #dc2626';
+      diamond.style.background = 'repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(220,38,38,.1) 4px,rgba(220,38,38,.1) 8px)';
+    }
+    if (done) {
+      diamond.style.opacity = '0.5';
+    }
+    diamond.addEventListener('click', () => openDetail(task.id));
+    timeline.appendChild(diamond);
+
+    if (blocked && !done) {
+      const badge = document.createElement('div');
+      badge.className = 'blocked-badge';
+      badge.style.left = (x+10)+'px';
+      badge.style.top = '2px';
+      badge.textContent = '⚠ blocked';
+      timeline.appendChild(badge);
+    }
+  } else {
+    const x = dateToX(task.start);
+    const width = Math.max(6, daysBetween(task.start, task.end) * ganttDayWidth);
+    const bar = document.createElement('div');
+    bar.className = `gantt-bar bar-type-${task.type}${done?' done':''}${blocked?' blocked':''}`;
+    bar.style.left = x+'px';
+    bar.style.width = width+'px';
+    if (done) bar.style.opacity = '0.5';
+    bar.addEventListener('click', () => openDetail(task.id));
+    timeline.appendChild(bar);
+
+    if (blocked && !done) {
+      const badge = document.createElement('div');
+      badge.className = 'blocked-badge';
+      badge.style.left = (x+width-40)+'px';
+      badge.textContent = '⚠ blocked';
+      timeline.appendChild(badge);
+    }
+  }
+
+  // Done tag
+  if (done && lastCheck) {
+    const doneTag = document.createElement('div');
+    doneTag.className = 'done-tag';
+    const x = singleDay ? dateToX(task.start)+ganttDayWidth/2-7 : dateToX(task.start);
+    doneTag.style.left = x+'px';
+    doneTag.textContent = `✓ ${lastCheck.name} ${new Date(lastCheck.ts).toLocaleDateString('en-US',{month:'short',day:'numeric'})}`;
+    timeline.appendChild(doneTag);
+  }
+
+  row.appendChild(timeline);
+  return row;
+}
+
+// ─── DETAIL PANEL ────────────────────────────────────────────────────────────
+function openDetail(id) {
+  selectedTaskId = id;
+  isEditing = false;
+  document.querySelectorAll('.gantt-row').forEach(r => r.classList.remove('selected'));
+  document.querySelector(`[data-task-id="${id}"]`)?.classList.add('selected');
+  const task = tasks.find(t=>t.id===id);
+  if (!task) return;
+  renderDetailPanel(task);
+  document.getElementById('detail-panel').classList.remove('hidden');
+}
+
+function closeDetail() {
+  selectedTaskId = null;
+  isEditing = false;
+  document.getElementById('detail-panel').classList.add('hidden');
+  document.querySelectorAll('.gantt-row').forEach(r => r.classList.remove('selected'));
+}
+
+function renderDetailPanel(task) {
+  document.getElementById('detail-title').textContent = task.name;
+  const body = document.getElementById('detail-body');
+  const done = isTaskDone(task.id);
+  const blocked = isBlocked(task);
+  const log = completions[task.id]||[];
+  const blockers = getBlockerDetails(task);
+
+  if (isEditing) {
+    renderEditForm(task, body);
+    return;
+  }
+
+  let html = `
+    <div class="detail-row">
+      <div class="detail-label">Dates</div>
+      <div class="detail-value">${fmtDate(task.start)}${task.start!==task.end?' → '+fmtDate(task.end):' (single day)'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Owner</div>
+      <div class="detail-value">${task.owner||'—'}</div>
+    </div>
+    <div class="detail-row">
+      <div class="detail-label">Type / Phase</div>
+      <div class="detail-value">
+        <span class="type-badge badge-${task.type}">${task.type}</span>
+        <span style="margin-left:6px;color:#888;font-size:12px">${task.phase}</span>
+      </div>
+    </div>`;
+
+  if (task.notes) {
+    html += `<div class="detail-row">
+      <div class="detail-label">Notes</div>
+      <div class="detail-notes">${escHtml(task.notes)}</div>
+    </div>`;
+  }
+
+  if (blockers.length) {
+    html += `<div class="detail-row">
+      <div class="detail-label">Blocked By</div>
+      <div>${blockers.map(b=>`
+        <div class="blocked-item" onclick="openDetail('${b.id}')">
+          <div class="blocked-status ${b.done?'status-done':'status-pending'}"></div>
+          <span style="color:${b.done?'#22c55e':'#f59e0b'}">${escHtml(b.name)}</span>
+          <span style="font-size:10px;color:#aaa">${b.done?'✓ done':'pending'}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  if (blocked && !done) {
+    html += `<div style="background:#fef2f2;border:1px solid #fecaca;border-radius:6px;padding:8px;font-size:12px;color:#991b1b">
+      ⚠ This task is blocked by uncompleted dependencies.
+    </div>`;
+  }
+
+  // Checkoff section
+  html += `<div class="checkoff-section">
+    <div class="detail-actions">
+      ${done
+        ? `<button class="btn" onclick="handleCheckToggle('${task.id}')">↩ Uncheck</button>`
+        : `<button class="btn btn-primary" onclick="handleCheckToggle('${task.id}')">✓ Mark Done</button>`
+      }
+      <button class="btn" onclick="startEdit('${task.id}')">Edit</button>
+    </div>`;
+
+  if (log.length) {
+    html += `<div style="margin-top:10px">
+      <div class="detail-label" style="margin-bottom:4px">Completion Log</div>
+      <div class="completion-log">
+        ${log.map(e=>`<div class="log-entry">
+          <span style="color:${e.action==='check'?'#22c55e':'#f59e0b'}">${e.action==='check'?'✓':'↩'}</span>
+          <strong>${escHtml(e.name)}</strong> — ${new Date(e.ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}
+        </div>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  html += `</div>`;
+  body.innerHTML = html;
+}
+
+function renderEditForm(task, body) {
+  body.innerHTML = `
+    <div class="form-row">
+      <label>Task Name</label>
+      <input class="edit-field" id="edit-name" value="${escAttr(task.name)}">
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="form-row" style="flex:1">
+        <label>Start</label>
+        <input class="edit-field" type="date" id="edit-start" value="${task.start}">
+      </div>
+      <div class="form-row" style="flex:1">
+        <label>End</label>
+        <input class="edit-field" type="date" id="edit-end" value="${task.end}">
+      </div>
+    </div>
+    <div class="form-row">
+      <label>Owner</label>
+      <input class="edit-field" id="edit-owner" value="${escAttr(task.owner||'')}">
+    </div>
+    <div class="form-row">
+      <label>Type</label>
+      <select class="edit-field" id="edit-type">
+        ${['deliverable','client','agency','build','milestone','deadline','ooo'].map(t=>`<option value="${t}"${task.type===t?' selected':''}>${t}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Phase</label>
+      <select class="edit-field" id="edit-phase">
+        ${PHASES.map(p=>`<option value="${p}"${task.phase===p?' selected':''}>${p}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-row">
+      <label>Notes</label>
+      <textarea class="edit-field" id="edit-notes">${escHtml(task.notes||'')}</textarea>
+    </div>
+    <div class="detail-actions">
+      <button class="btn btn-primary" onclick="saveEdit('${task.id}')">Save</button>
+      <button class="btn" onclick="cancelEdit('${task.id}')">Cancel</button>
+    </div>
+  `;
+}
+
+function startEdit(id) {
+  isEditing = true;
+  const task = tasks.find(t=>t.id===id);
+  if (!task) return;
+  renderEditForm(task, document.getElementById('detail-body'));
+}
+
+function cancelEdit(id) {
+  isEditing = false;
+  const task = tasks.find(t=>t.id===id);
+  if (task) renderDetailPanel(task);
+}
+
+function saveEdit(id) {
+  const task = tasks.find(t=>t.id===id);
+  if (!task) return;
+  task.name = document.getElementById('edit-name').value.trim() || task.name;
+  task.start = document.getElementById('edit-start').value || task.start;
+  task.end = document.getElementById('edit-end').value || task.end;
+  task.owner = document.getElementById('edit-owner').value.trim();
+  task.type = document.getElementById('edit-type').value;
+  task.phase = document.getElementById('edit-phase').value;
+  task.notes = document.getElementById('edit-notes').value.trim();
+  isEditing = false;
+  saveState();
+  render();
+}
+
+// ─── CHECK-OFF ────────────────────────────────────────────────────────────────
+function handleCheckToggle(id) {
+  const done = isTaskDone(id);
+  if (done) {
+    // Uncheck with confirmation
+    showNamePrompt('Who is unchecking this task?', (name) => {
+      if (!confirm('Are you sure you want to uncheck this task?')) return;
+      if (!completions[id]) completions[id] = [];
+      completions[id].push({name, ts: Date.now(), action:'uncheck'});
+      saveState();
+      render();
+    });
+  } else {
+    showNamePrompt('Who is marking this done?', (name) => {
+      if (!completions[id]) completions[id] = [];
+      completions[id].push({name, ts: Date.now(), action:'check'});
+      saveState();
+      render();
+    });
+  }
+}
+
+function showNamePrompt(title, callback) {
+  namePromptCallback = callback;
+  document.getElementById('name-prompt-title').textContent = title;
+  document.getElementById('name-prompt-input').value = '';
+  document.getElementById('name-prompt').classList.remove('hidden');
+  setTimeout(() => document.getElementById('name-prompt-input').focus(), 50);
+}
+
+function confirmNamePrompt() {
+  const name = document.getElementById('name-prompt-input').value.trim();
+  if (!name) { alert('Please enter your name.'); return; }
+  document.getElementById('name-prompt').classList.add('hidden');
+  if (namePromptCallback) namePromptCallback(name);
+  namePromptCallback = null;
+}
+
+function cancelNamePrompt() {
+  document.getElementById('name-prompt').classList.add('hidden');
+  namePromptCallback = null;
+}
+
+// ─── ADD TASK ────────────────────────────────────────────────────────────────
+function openAddTask() {
+  // Populate blocked-by select
+  const sel = document.getElementById('new-blocked-by');
+  sel.innerHTML = tasks.map(t=>`<option value="${t.id}">${t.name}</option>`).join('');
+  // Set today as default dates
+  document.getElementById('new-start').value = settings.today;
+  document.getElementById('new-end').value = settings.today;
+  document.getElementById('new-name').value = '';
+  document.getElementById('new-owner').value = '';
+  document.getElementById('new-notes').value = '';
+  document.getElementById('add-task-modal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('new-name').focus(),50);
+}
+
+function closeAddTask() {
+  document.getElementById('add-task-modal').classList.add('hidden');
+}
+
+function saveNewTask() {
+  const name = document.getElementById('new-name').value.trim();
+  if (!name) { alert('Task name is required.'); return; }
+  const start = document.getElementById('new-start').value;
+  const end = document.getElementById('new-end').value;
+  if (!start || !end) { alert('Dates are required.'); return; }
+
+  const sel = document.getElementById('new-blocked-by');
+  const blockedBy = Array.from(sel.selectedOptions).map(o=>o.value).filter(Boolean);
+
+  const id = 't' + Date.now();
+  tasks.push({
+    id,
+    name,
+    start,
+    end,
+    owner: document.getElementById('new-owner').value.trim(),
+    type: document.getElementById('new-type').value,
+    phase: document.getElementById('new-phase').value,
+    notes: document.getElementById('new-notes').value.trim(),
+    blockedBy: blockedBy.length ? blockedBy : undefined
+  });
+
+  saveState();
+  closeAddTask();
+  render();
+}
+
+// ─── SETTINGS ────────────────────────────────────────────────────────────────
+function toggleSettings() {
+  document.getElementById('settings-panel').classList.toggle('open');
+}
+
+function renderSettingsUI() {
+  document.getElementById('setting-today').value = settings.today;
+  document.getElementById('setting-ooo-start').value = settings.oooStart;
+  document.getElementById('setting-ooo-end').value = settings.oooEnd;
+
+  const tabsEl = document.getElementById('settings-tabs-config');
+  tabsEl.innerHTML = settings.filters.map((f,i)=>`
+    <div style="margin-bottom:10px;padding:8px;border:1px solid #e5e5e5;border-radius:6px">
+      <div class="form-row" style="margin-bottom:6px">
+        <label style="font-size:10px;color:#888">Tab ${i+1} Label</label>
+        <input style="border:1px solid #d1d1d1;border-radius:4px;padding:4px 8px;font-size:12px;width:100%"
+               value="${escAttr(f.label)}" onchange="updateTabLabel(${i},this.value)">
+      </div>
+      <div style="display:flex;gap:6px">
+        <div style="flex:1">
+          <label style="font-size:10px;color:#888">Start</label>
+          <input type="date" style="border:1px solid #d1d1d1;border-radius:4px;padding:4px 8px;font-size:12px;width:100%"
+                 value="${f.start}" onchange="updateTabDate(${i},'start',this.value)">
+        </div>
+        <div style="flex:1">
+          <label style="font-size:10px;color:#888">End</label>
+          <input type="date" style="border:1px solid #d1d1d1;border-radius:4px;padding:4px 8px;font-size:12px;width:100%"
+                 value="${f.end}" onchange="updateTabDate(${i},'end',this.value)">
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateTabLabel(i, val) {
+  settings.filters[i].label = val;
+  saveState();
+  renderFilterTabs();
+}
+
+function updateTabDate(i, key, val) {
+  settings.filters[i][key] = val;
+  saveState();
+  if (i === activeFilter) render();
+}
+
+function applySettings() {
+  settings.today = document.getElementById('setting-today').value || settings.today;
+  settings.oooStart = document.getElementById('setting-ooo-start').value || settings.oooStart;
+  settings.oooEnd = document.getElementById('setting-ooo-end').value || settings.oooEnd;
+  saveState();
+  render();
+}
+
+// ─── EXPORT / IMPORT ─────────────────────────────────────────────────────────
+function exportData() {
+  const data = {tasks, settings, completions, exported: new Date().toISOString()};
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'sea-potential-timeline-'+new Date().toISOString().split('T')[0]+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      const data = JSON.parse(e.target.result);
+      const mode = confirm('Replace all data? Click OK to replace, Cancel to merge.');
+      if (mode) {
+        if (data.tasks) tasks = data.tasks;
+        if (data.settings) settings = data.settings;
+        if (data.completions) completions = data.completions;
+      } else {
+        if (data.tasks) {
+          data.tasks.forEach(t => {
+            const existing = tasks.find(x=>x.id===t.id);
+            if (existing) Object.assign(existing, t);
+            else tasks.push(t);
+          });
+        }
+        if (data.completions) Object.assign(completions, data.completions);
+      }
+      saveState();
+      render();
+    } catch(err) {
+      alert('Invalid JSON file.');
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+// ─── UTILS ───────────────────────────────────────────────────────────────────
+function escHtml(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s||'').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Handle gantt horizontal scrolling sync
+function syncScroll() {
+  const body = document.getElementById('gantt-body');
+  const header = document.getElementById('timeline-header').parentElement;
+  body.addEventListener('scroll', () => {
+    header.scrollLeft = body.scrollLeft;
+  });
+}
+
+// ─── INIT ────────────────────────────────────────────────────────────────────
+loadState();
+render();
+syncScroll();
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (!document.getElementById('name-prompt').classList.contains('hidden')) {
+      cancelNamePrompt();
+    } else if (!document.getElementById('add-task-modal').classList.contains('hidden')) {
+      closeAddTask();
+    } else if (document.getElementById('settings-panel').classList.contains('open')) {
+      toggleSettings();
+    } else {
+      closeDetail();
+    }
+  }
+});
+</script>
+</body>
+</html>

@@ -1119,9 +1119,28 @@ function syncScroll() {
 }
 
 // ─── INIT ────────────────────────────────────────────────────────────────────
-loadState();
-render();
-syncScroll();
+async function initApp() {
+  document.body.style.opacity = '0.5';
+  try {
+    const remoteTasks = await apiFetch('/tasks');
+    tasks = remoteTasks;
+    localStorage.setItem('sp_tasks', JSON.stringify(tasks));
+    const savedSettings = localStorage.getItem('sp_settings');
+    settings = savedSettings ? JSON.parse(savedSettings) : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
+    const savedCompletions = localStorage.getItem('sp_completions');
+    completions = savedCompletions ? JSON.parse(savedCompletions) : {};
+    const savedCollapsed = localStorage.getItem('sp_collapsed');
+    collapsedPhases = savedCollapsed ? JSON.parse(savedCollapsed) : {};
+  } catch (err) {
+    console.error('Could not load tasks from API, falling back to localStorage:', err);
+    loadState();
+  }
+  document.body.style.opacity = '1';
+  render();
+  syncScroll();
+}
+
+initApp();
 
 // Keyboard shortcuts
 document.addEventListener('keydown', (e) => {

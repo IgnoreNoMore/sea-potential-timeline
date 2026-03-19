@@ -334,6 +334,25 @@ textarea.edit-field{resize:vertical;min-height:60px}
 </div>
 
 <script>
+// ─── API CONFIG ───────────────────────────────────────────────────────────────
+const API_BASE = 'https://sea-potential-api.YOUR_SUBDOMAIN.workers.dev'; // update after deploy
+const API_KEY = 'YOUR_API_KEY'; // update after deploy
+const SYNC_INTERVAL_MS = 15000;
+async function apiFetch(path, method = 'GET', body = null) {
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Api-Key': API_KEY,
+    },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API_BASE + path, opts);
+  if (!res.ok) throw new Error(`API ${method} ${path} failed: ${res.status}`);
+  return res.json();
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── DATA ────────────────────────────────────────────────────────────────────
 const PHASES = ['PRE-OOO','FULL TEAM OOO','PHASE 1 BRANDING','PHASE 2 JOB BOARD','PHASE 3 WEBSITE','PHASE 4 CERTIFICATION'];
 
@@ -416,7 +435,10 @@ function loadState() {
 }
 
 function saveState() {
-  localStorage.setItem('sp_tasks', JSON.stringify(tasks));
+  apiFetch('/tasks', 'POST', tasks).catch(err => {
+    console.error('Could not sync tasks:', err);
+    localStorage.setItem('sp_tasks', JSON.stringify(tasks));
+  });
   localStorage.setItem('sp_settings', JSON.stringify(settings));
   localStorage.setItem('sp_completions', JSON.stringify(completions));
   localStorage.setItem('sp_collapsed', JSON.stringify(collapsedPhases));

@@ -1,0 +1,9 @@
+name = "sea-potential-api"
+main = "index.js"
+compatibility_date = "2026-03-18"
+
+[[kv_namespaces]]
+binding = "SP_STORE"
+# TODO: replace this placeholder with your real namespace ID after running:
+#   npx wrangler kv namespace create SP_STORE
+id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"

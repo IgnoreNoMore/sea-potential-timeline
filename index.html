@@ -422,7 +422,7 @@ function loadState() {
     tasks = savedTasks ? JSON.parse(savedTasks) : JSON.parse(JSON.stringify(DEFAULT_TASKS));
     const savedSettings = localStorage.getItem('sp_settings');
     settings = savedSettings ? JSON.parse(savedSettings) : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-    const savedCompletions = localStorage.getItem('sp_completions');
+    const savedCompletions = localStorage.getItem('sp_completions') || '{}';
     completions = savedCompletions ? JSON.parse(savedCompletions) : {};
     const savedCollapsed = localStorage.getItem('sp_collapsed');
     collapsedPhases = savedCollapsed ? JSON.parse(savedCollapsed) : {};
@@ -440,7 +440,10 @@ function saveState() {
     localStorage.setItem('sp_tasks', JSON.stringify(tasks));
   });
   localStorage.setItem('sp_settings', JSON.stringify(settings));
+  apiFetch('/completions', 'POST', completions).catch(err => {
+  console.error('Could not sync completions:', err);
   localStorage.setItem('sp_completions', JSON.stringify(completions));
+});
   localStorage.setItem('sp_collapsed', JSON.stringify(collapsedPhases));
 }
   apiFetch('/completions', 'POST', completions).catch(err => {

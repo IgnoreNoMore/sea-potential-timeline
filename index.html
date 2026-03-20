@@ -443,6 +443,10 @@ function saveState() {
   localStorage.setItem('sp_completions', JSON.stringify(completions));
   localStorage.setItem('sp_collapsed', JSON.stringify(collapsedPhases));
 }
+  apiFetch('/completions', 'POST', completions).catch(err => {
+  console.error('Could not sync completions:', err);
+  localStorage.setItem('sp_completions', JSON.stringify(completions));
+});
 
 function resetData() {
   localStorage.clear();
@@ -1125,21 +1129,24 @@ async function initApp() {
     const remoteTasks = await apiFetch('/tasks');
     tasks = remoteTasks;
     localStorage.setItem('sp_tasks', JSON.stringify(tasks));
-    const savedSettings = localStorage.getItem('sp_settings');
-    settings = savedSettings ? JSON.parse(savedSettings) : JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
-    const savedCompletions = localStorage.getItem('sp_completions');
-    completions = savedCompletions ? JSON.parse(savedCompletions) : {};
+
+    const remoteCompletions = await apiFetch('/completions').catch(() => null);
+    completions = remoteCompletions || JSON.parse(localStorage.getItem('sp_completions') || '{}');
+
+    const remoteSettings = await apiFetch('/settings').catch(() => null);
+    settings = remoteSettings || JSON.parse(localStorage.getItem('sp_settings') || JSON.stringify(DEFAULT_SETTINGS));
+
     const savedCollapsed = localStorage.getItem('sp_collapsed');
     collapsedPhases = savedCollapsed ? JSON.parse(savedCollapsed) : {};
+
   } catch (err) {
-    console.error('Could not load tasks from API, falling back to localStorage:', err);
+    console.error('Could not load from API, falling back to localStorage:', err);
     loadState();
   }
   document.body.style.opacity = '1';
   render();
   syncScroll();
 }
-
 initApp();
 
 // Keyboard shortcuts

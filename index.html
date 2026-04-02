@@ -945,13 +945,23 @@ function handleCheckToggle(id) {
   }
 }
 
-function showNamePrompt(title, callback) {
+function showNamePrompt(title, callback, showDate = false) {
   namePromptCallback = callback;
   document.getElementById('name-prompt-title').textContent = title;
   document.getElementById('name-prompt-input').value = '';
+  const dateRow = document.getElementById('name-prompt-date-row');
+  if (showDate) {
+    const t = new Date();
+    document.getElementById('name-prompt-date').value =
+      t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+    dateRow.style.display = 'block';
+  } else {
+    dateRow.style.display = 'none';
+  }
   document.getElementById('name-prompt').classList.remove('hidden');
   setTimeout(() => document.getElementById('name-prompt-input').focus(), 50);
 }
+
 
 function confirmNamePrompt() {
   const name = document.getElementById('name-prompt-input').value.trim();

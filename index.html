@@ -446,10 +446,6 @@ function saveState() {
 });
   localStorage.setItem('sp_collapsed', JSON.stringify(collapsedPhases));
 }
-  apiFetch('/completions', 'POST', completions).catch(err => {
-  console.error('Could not sync completions:', err);
-  localStorage.setItem('sp_completions', JSON.stringify(completions));
-});
 
 function resetData() {
   localStorage.clear();

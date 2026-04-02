@@ -926,11 +926,13 @@ function handleCheckToggle(id) {
   const done = isTaskDone(id);
   if (done) {
     // Uncheck with confirmation
-    showNamePrompt('Who is unchecking this task?', (name) => {
-      if (!confirm('Are you sure you want to uncheck this task?')) return;
+        showNamePrompt('Who is marking this done?', (name, date) => {
       if (!completions[id]) completions[id] = [];
-      completions[id].push({name, ts: Date.now(), action:'uncheck'});
+      completions[id].push({name, ts: date ? new Date(date).getTime() : Date.now(), action:'check'});
       saveState();
+      render();
+    }, true);
+
       render();
     });
   } else {

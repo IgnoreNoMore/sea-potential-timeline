@@ -966,10 +966,13 @@ function showNamePrompt(title, callback, showDate = false) {
 function confirmNamePrompt() {
   const name = document.getElementById('name-prompt-input').value.trim();
   if (!name) { alert('Please enter your name.'); return; }
+  const dateRow = document.getElementById('name-prompt-date-row');
+  const date = dateRow.style.display !== 'none' ? document.getElementById('name-prompt-date').value : null;
   document.getElementById('name-prompt').classList.add('hidden');
-  if (namePromptCallback) namePromptCallback(name);
+  if (namePromptCallback) namePromptCallback(name, date);
   namePromptCallback = null;
 }
+
 
 function cancelNamePrompt() {
   document.getElementById('name-prompt').classList.add('hidden');

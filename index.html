@@ -1134,8 +1134,10 @@ tasks = (Array.isArray(remoteTasks) && remoteTasks.length > 0)
   ? remoteTasks 
   : JSON.parse(JSON.stringify(DEFAULT_TASKS));
 
-    const remoteCompletions = await apiFetch('/completions').catch(() => null);
-    completions = remoteCompletions || JSON.parse(localStorage.getItem('sp_completions') || '{}');
+const remoteCompletions = await apiFetch('/completions').catch(() => null);
+completions = (remoteCompletions && typeof remoteCompletions === 'object' && Object.keys(remoteCompletions).length > 0)
+  ? remoteCompletions
+  : JSON.parse(localStorage.getItem('sp_completions') || '{}');
 
     const remoteSettings = await apiFetch('/settings').catch(() => null);
     settings = remoteSettings || JSON.parse(localStorage.getItem('sp_settings') || JSON.stringify(DEFAULT_SETTINGS));

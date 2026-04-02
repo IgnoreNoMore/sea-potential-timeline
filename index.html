@@ -293,6 +293,11 @@ textarea.edit-field{resize:vertical;min-height:60px}
   <div class="name-prompt-box">
     <h3 id="name-prompt-title">Who is marking this done?</h3>
     <input type="text" id="name-prompt-input" placeholder="Your name" onkeydown="if(event.key==='Enter')confirmNamePrompt()">
+        <div id="name-prompt-date-row" style="display:none;margin-bottom:12px">
+      <label style="font-size:12px;color:#666;display:block;margin-bottom:4px">Date completed</label>
+      <input type="date" id="name-prompt-date" style="width:100%" onkeydown="if(event.key==='Enter')confirmNamePrompt()">
+    </div>
+
     <div class="name-prompt-actions">
       <button class="btn" onclick="cancelNamePrompt()">Cancel</button>
       <button class="btn btn-primary" onclick="confirmNamePrompt()">Confirm</button>
